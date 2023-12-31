@@ -6,7 +6,7 @@ import 'package:kima/src/blocs/main/authentication/login/login_bloc/login_bloc.d
 import 'package:kima/src/blocs/main/authentication/registration/registration_bloc/registration_bloc.dart';
 import 'package:kima/src/blocs/main/user/user_bloc.dart';
 import 'package:kima/src/data/models/user_profile.dart';
-import 'package:kima/src/screens/Payment/stripe_service.dart';
+import 'package:kima/src/screens/Payment/stripe_view.dart';
 import 'package:kima/src/screens/authentication/registration/components/registration_account_info.dart';
 import 'package:kima/src/screens/authentication/registration/components/registration_account_type.dart';
 import 'package:kima/src/screens/authentication/registration/components/registration_app_bar.dart';
@@ -108,30 +108,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       userType: _userType,
     ));
 
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
+
+// payment page
+
+     await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const StrPaymentView()),
+  );
+
+//After payment is completed, continue with account creation
+   _registrationBloc.add(RegistrationEventNative(
+    userProfile: registration,
+    userType: _userType,
+  ));
+
   }
 
-  void _onGooglePressed() async {
+
+
+  void _onGooglePressed() {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.google));
-
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
   }
 
-  void _onApplePressed() async {
+  void _onApplePressed() {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.apple));
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
   }
 
-  void _onFacebookPressed() async {
+  void _onFacebookPressed() {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.facebook));
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
   }
 
   void _onUserTypeChanged(UserTypeEnum? type) {
@@ -188,8 +195,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   /// If the password matched with passwordConfirmation, will return validation is valid
   bool _passwordMatch() {
-    return _passwordMatchValidation == ValidationEnum.valid ||
-        _passwordMatchValidation == ValidationEnum.none;
+    return _passwordMatchValidation == ValidationEnum.valid || _passwordMatchValidation == ValidationEnum.none;
   }
 
   @override
@@ -249,8 +255,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 showLoader(context);
               }
               if (loginState is LoginStateSuccess) {
-                BlocProvider.of<UserBloc>(context)
-                    .add(SetCurrentUserEvent(loginState.user));
+                BlocProvider.of<UserBloc>(context).add(SetCurrentUserEvent(loginState.user));
                 closeLoader(context);
                 Navigator.pushReplacementNamed(context, Root.route);
               }
@@ -299,8 +304,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               contactController: _contactController,
                               emailController: _emailController,
                               passwordController: _passwordController,
-                              passwordConfirmationController:
-                                  _passwordConfirmationController,
+                              passwordConfirmationController: _passwordConfirmationController,
                               onFirstNameChanged: _onTextFieldChanged,
                               onLastNameChanged: _onTextFieldChanged,
                               onContactChanged: (contact, isValid) {
@@ -310,12 +314,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               },
                               onEmailChanged: _onTextFieldChanged,
                               onPasswordChanged: _onTextFieldChanged,
-                              onPasswordConfirmationChanged:
-                                  _onPasswordConfirmationChanged,
+                              onPasswordConfirmationChanged: _onPasswordConfirmationChanged,
                               errorEmailText: emailErrorMessage,
-                              errorPasswordMatchText: !_passwordMatch()
-                                  ? 'Password doesn’t match'
-                                  : '',
+                              errorPasswordMatchText: !_passwordMatch() ? 'Password doesn’t match' : '',
                             ),
                             const SizedBox(height: 40.0),
                             if (!keyboardVisible)
@@ -325,10 +326,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 onGooglePressed: _onGooglePressed,
                                 onFacebookPressed: _onFacebookPressed,
                                 onApplePressed: _onApplePressed,
-                                isProfessionalOrBusiness:
-                                    _userType == UserTypeEnum.professional ||
-                                        _userType == UserTypeEnum.business,
-                              )
+                              ),
                           ],
                         ),
                       ),

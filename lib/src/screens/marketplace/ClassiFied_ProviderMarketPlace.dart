@@ -1,6 +1,4 @@
 import 'package:kima/src/data/models/classifieds_model.dart';
-import 'package:kima/src/screens/marketplace/widgets/UserProfile.dart';
-
 
 class ClassifiedProviderMarketPlace {
   Future<List<Classified>> getClassifieds() async {

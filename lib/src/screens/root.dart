@@ -16,6 +16,7 @@ import 'package:kima/src/screens/dashboard/profile/dashboard_regular_profile/das
 import 'package:kima/src/screens/favorites/favorites_screen.dart';
 import 'package:kima/src/screens/marketplace/classifieds_description_screen.dart';
 import 'package:kima/src/screens/marketplace/marketplace_screen.dart';
+// import 'package:kima/src/screens/message/message_screen.dart';
 import 'package:kima/src/screens/message/working%20chat/conversation_screen.dart';
 import 'package:kima/src/screens/profile/about_screen.dart';
 import 'package:kima/src/screens/profile/profile_screen.dart';
@@ -62,10 +63,9 @@ class _RootState extends State<Root> {
 
             if (id == loggedInUser?.id) {
               _navCubit.emitBottomNav(BottomNavEnum.home);
-              _switchViewCubit.selectedRoute(
-                  loggedInUser!.isBusinessOrProfessionalUser
-                      ? DashboardBusinessProfileScreen.route
-                      : DashboardRegularProfileScreen.route);
+              _switchViewCubit.selectedRoute(loggedInUser!.isBusinessOrProfessionalUser
+                  ? DashboardBusinessProfileScreen.route
+                  : DashboardRegularProfileScreen.route);
             } else {
               BlocProvider.of<UserBloc>(context).add(GetUserVisitByIdEvent(id));
               _navCubit.emitBottomNav(BottomNavEnum.search);
@@ -97,8 +97,7 @@ class _RootState extends State<Root> {
     _switchViewCubit = BlocProvider.of<SwitchViewCubit>(context);
 
     /// Load current daily status of the logged in user
-    BlocProvider.of<DailyStatusBloc>(context)
-        .add(const GetCurrentStatusByIdEvent());
+    BlocProvider.of<DailyStatusBloc>(context).add(const GetCurrentStatusByIdEvent());
 
     // _userProfileCubit = BlocProvider.of<AppUserProfileCubit>(context);
     // _userProfileCubit.emitProfileJwt();
@@ -143,48 +142,35 @@ class _RootState extends State<Root> {
           body: Builder(
             builder: (context) {
               if (navState == BottomNavEnum.home) {
-                return BlocBuilder<SwitchViewCubit, String>(
-                    builder: (context, route) {
-                  if (route == DashboardScreen.route)
-                    return const DashboardScreen();
-                  if (route == DashboardRegularProfileScreen.route)
-                    return const DashboardRegularProfileScreen();
-                  if (route == DashboardBusinessProfileScreen.route)
-                    return const DashboardBusinessProfileScreen();
-                  if (route == EditProfileScreen.route)
-                    return const EditProfileScreen();
-                  if (route == EditBioScreen.route)
-                    return const EditBioScreen();
+                return BlocBuilder<SwitchViewCubit, String>(builder: (context, route) {
+                  if (route == DashboardScreen.route) return const DashboardScreen();
+                  if (route == DashboardRegularProfileScreen.route) return const DashboardRegularProfileScreen();
+                  if (route == DashboardBusinessProfileScreen.route) return const DashboardBusinessProfileScreen();
+                  if (route == EditProfileScreen.route) return const EditProfileScreen();
+                  if (route == EditBioScreen.route) return const EditBioScreen();
 
-                  if (route == NotificationsScreen.route)
-                    return const NotificationsScreen();
+                  if (route == NotificationsScreen.route) return const NotificationsScreen();
 
                   // Business/Professional Daily status
-                  if (route == EditDailyStatus.route)
-                    return const EditDailyStatus();
+                  if (route == EditDailyStatus.route) return const EditDailyStatus();
                   return const DashboardScreen();
                 });
               }
               if (navState == BottomNavEnum.search) {
-                return BlocBuilder<SwitchViewCubit, String>(
-                    builder: (context, route) {
+                return BlocBuilder<SwitchViewCubit, String>(builder: (context, route) {
                   if (route == SearchScreen.route) return const SearchScreen();
 
                   /// User profile visit
-                  if (route == ProfileVisitScreen.route)
-                    return const ProfileVisitScreen();
-                  if (route == ProfileVisitSettingsScreen.route)
-                    return const ProfileVisitSettingsScreen();
+                  if (route == ProfileVisitScreen.route) return const ProfileVisitScreen();
+                  if (route == ProfileVisitSettingsScreen.route) return const ProfileVisitSettingsScreen();
 
                   if (route == ReportScreen.route) return const ReportScreen();
-                  if (route == ReportAdditionalDetailScreen.route)
-                    return const ReportAdditionalDetailScreen();
+                  if (route == ReportAdditionalDetailScreen.route) return const ReportAdditionalDetailScreen();
                   return const SearchScreen();
                 });
               }
               if (navState == BottomNavEnum.market) {
-                return BlocBuilder<SwitchViewCubit, String>(
-                    builder: (context, route) {
+                return BlocBuilder<SwitchViewCubit, String>(builder: (context, route) {
                   if (route == MarketPlaceScreen.route) {
                     return const MarketPlaceScreen();
                   } else if (route == ClassifiedsDescriptionScreen.route) {
@@ -199,8 +185,7 @@ class _RootState extends State<Root> {
                 });
               }
               if (navState == BottomNavEnum.favorite) {
-                return BlocBuilder<SwitchViewCubit, String>(
-                    builder: (context, route) {
+                return BlocBuilder<SwitchViewCubit, String>(builder: (context, route) {
                   if (route == FavoritesScreen.route) {
                     return const FavoritesScreen();
                   } else if (route == ProfileScreen.route) {

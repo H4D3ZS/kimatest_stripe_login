@@ -11,7 +11,6 @@ class RegistrationButton extends StatelessWidget {
   final Function() onFacebookPressed;
   final Function() onApplePressed;
   final bool enable;
-  final bool isProfessionalOrBusiness;
 
   const RegistrationButton({
     super.key,
@@ -20,16 +19,14 @@ class RegistrationButton extends StatelessWidget {
     required this.onFacebookPressed,
     required this.onApplePressed,
     required this.enable,
-    required this.isProfessionalOrBusiness,
   });
-
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         CustomButton.green(
-          label: isProfessionalOrBusiness ? 'Proceed to Payment' : 'Create Account',
+          label: 'Create Account',
           enable: enable,
           onPressed: onCreateAccountPressed,
         ),
