@@ -13,6 +13,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:kima/src/data/models/user_profile.dart';
 import 'package:kima/src/data/services/authentication_service.dart';
 import 'package:kima/src/data/services/user_service.dart';
+import 'package:kima/src/screens/Payment/stripe_service.dart';
 import 'package:kima/src/utils/enums.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:kima/src/utils/configs.dart';
@@ -21,10 +22,15 @@ import 'package:kima/src/utils/exceptions/api_result_exception.dart';
 import 'package:kima/src/utils/failures/failure_sso_cancelled.dart';
 import 'package:kima/src/utils/helpers/print_helpers.dart';
 import 'package:kima/src/utils/helpers/shared_pref_helpers.dart';
+import 'package:flutter/material.dart';
 
 part 'login_event.dart';
 
 part 'login_state.dart';
+
+class LoginEventGoogle extends LoginEventSso {
+  LoginEventGoogle() : super(sso: SsoEnum.google);
+}
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginStateInitial()) {
@@ -58,19 +64,24 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final email = event.email;
       final password = event.password;
 
-      final auth = await _chopper.getService<AuthenticationService>().postLoginNative(
-            email: email,
-            password: password,
-          );
+      final auth =
+          await _chopper.getService<AuthenticationService>().postLoginNative(
+                email: email,
+                password: password,
+              );
 
-      if (!auth.isSuccessful) throw ApiResultException(message: json.decode(auth.bodyString)['message']);
+      if (!auth.isSuccessful)
+        throw ApiResultException(
+            message: json.decode(auth.bodyString)['message']);
 
       final token = auth.headers['authorization'];
       final id = JwtDecoder.decode(token!)['id'];
 
       await setStringSharedPref(spProfileJwt, token);
 
-      final response = await _chopper.getService<UserService>().getById(token: token, id: id);
+      final response = await _chopper
+          .getService<UserService>()
+          .getById(token: token, id: id);
       final user = UserProfile.fromJson(response.body);
 
       emit(LoginStateSuccess(user));
@@ -99,6 +110,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       if (sso == SsoEnum.google) {
         userCredentials = await _googleUserCredentials();
+        userCredentials = await _googleUserCredentials();
       } else if (sso == SsoEnum.apple) {
         userCredentials = await _appleUserCredentials();
       } else if (sso == SsoEnum.facebook) {
@@ -112,19 +124,29 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         final firebaseToken = await userCredentials.user?.getIdToken();
 
         if (firebaseToken != null) {
-          final auth = await _chopper.getService<AuthenticationService>().postLoginSso(token: firebaseToken);
+          final auth = await _chopper
+              .getService<AuthenticationService>()
+              .postLoginSso(token: firebaseToken);
 
-          if (!auth.isSuccessful) throw ApiResultException(message: json.decode(auth.bodyString)['message']);
+          if (!auth.isSuccessful)
+            throw ApiResultException(
+                message: json.decode(auth.bodyString)['message']);
 
           final token = auth.headers['authorization'];
           final id = JwtDecoder.decode(token!)['id'];
 
           await setStringSharedPref(spProfileJwt, token);
 
-          final response = await _chopper.getService<UserService>().getById(token: token, id: id);
+          final response = await _chopper
+              .getService<UserService>()
+              .getById(token: token, id: id);
           final user = UserProfile.fromJson(response.body);
 
           emit(LoginStateSuccess(user));
+
+          // if{
+          //   //function here later
+          // }
         }
       } else {
         emit(const LoginStateFailed(FailureSsoCancelled()));
@@ -206,10 +228,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     if (loginResult.accessToken != null) {
       // Create a credential from the access token
-      final facebookAuthCredential = FacebookAuthProvider.credential(loginResult.accessToken!.token);
+      final facebookAuthCredential =
+          FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
       // Once signed in, return the UserCredential
-      return await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+      return await FirebaseAuth.instance
+          .signInWithCredential(facebookAuthCredential);
     }
 
     return null;

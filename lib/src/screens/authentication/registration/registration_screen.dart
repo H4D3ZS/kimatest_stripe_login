@@ -108,30 +108,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       userType: _userType,
     ));
 
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
+    await PaymentPage();
   }
 
   void _onGooglePressed() async {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.google));
 
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
+    await PaymentPage();
   }
 
   void _onApplePressed() async {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.apple));
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
+    await PaymentPage();
   }
 
   void _onFacebookPressed() async {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.facebook));
-    await StripePaymentHandler.initStripe();
-    await StripePaymentHandler.handlePayment();
+    await PaymentPage();
   }
 
   void _onUserTypeChanged(UserTypeEnum? type) {

@@ -1,5 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kima/src/blocs/main/authentication/login/login_bloc/login_bloc.dart';
+import 'package:kima/src/blocs/main/user/user_bloc.dart';
+import 'package:kima/src/screens/Payment/stripe_service.dart';
+import 'package:kima/src/screens/authentication/login/components/login_buttons.dart';
+import 'package:kima/src/screens/authentication/login/components/login_text_fields.dart';
+import 'package:kima/src/screens/authentication/login/components/login_title.dart';
+import 'package:kima/src/screens/authentication/registration/registration_screen.dart';
+import 'package:kima/src/screens/dashboard/dashboard_screen.dart';
+import 'package:kima/src/screens/root.dart';
+import 'package:kima/src/utils/enums.dart';
+import 'package:kima/src/utils/failures/failure_sso_cancelled.dart';
+import 'package:kima/src/utils/helpers/print_helpers.dart';
+import 'package:kima/src/utils/widgets/customs/custom_loader.dart';
+import 'package:kima/src/utils/widgets/customs/custom_snackbar.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kima/src/blocs/main/authentication/login/login_bloc/login_bloc.dart';
 import 'package:kima/src/blocs/main/user/user_bloc.dart';
 import 'package:kima/src/screens/authentication/login/components/login_buttons.dart';
@@ -56,9 +74,27 @@ class _LoginScreenState extends State<LoginScreen> {
     _loginBloc.add(LoginEventNative(email: email, password: password));
   }
 
-  void _onLoginByGooglePressed() {
+  // void _onLoginByGooglePressed() {
+  //   FocusScope.of(context).unfocus();
+  //   _loginBloc.add(const LoginEventSso(sso: SsoEnum.google));
+  // }
+  void _onLoginByGooglePressed() async {
     FocusScope.of(context).unfocus();
     _loginBloc.add(const LoginEventSso(sso: SsoEnum.google));
+    // Wait for the login state to be processed
+    await Future.delayed(Duration(seconds: 2)); // Adjust the delay as needed
+
+    // Check if login was successful
+    final loginState = _loginBloc.state;
+    if (loginState is LoginStateSuccess) {
+      // Navigate to the payment page
+      Navigator.pushNamed(context, PaymentPage.route);
+      // Wait for the payment to be processed
+      await Future.delayed(Duration(seconds: 2)); // Adjust the delay as needed
+
+      // Navigate to the main screen of the dashboard
+      Navigator.pushReplacementNamed(context, DashboardScreen.route);
+    }
   }
 
   void _onLoginByApplePressed() {
@@ -102,7 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
             showLoader(context);
           }
           if (loginState is LoginStateSuccess) {
-            BlocProvider.of<UserBloc>(context).add(SetCurrentUserEvent(loginState.user));
+            BlocProvider.of<UserBloc>(context)
+                .add(SetCurrentUserEvent(loginState.user));
             closeLoader(context);
             Navigator.pushReplacementNamed(context, Root.route);
           }
